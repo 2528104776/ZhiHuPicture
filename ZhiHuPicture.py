@@ -37,7 +37,7 @@ def main(x):
     futures.wait(fs)
 
     for i in fs:
-        if i.status_code==200:
+        if i.result().status_code==200:
             file = open(f'/storage/emulated/0/知乎图片/{int(time.time()*1000)}.jpg',mode = 'ab')
             file.write(res.content)
             print("写入成功！")
