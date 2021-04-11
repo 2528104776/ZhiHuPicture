@@ -29,20 +29,26 @@ def main(x):
 
     rt = list(set(result))
 
-    executor = futures.ThreadPoolExecutor(max_workers = 8)
-    for url in rt:
-        f = executor.submit(requests.get,url)
-        fs.append(f)
 
-    futures.wait(fs)
 
-    for i in fs:
-        if i.result().status_code==200:
-            file = open(f'/storage/emulated/0/知乎图片/{int(time.time()*1000)}.jpg',mode = 'ab')
-            file.write(i.result().content)
-            print("写入成功！")
-    file.close()
-    print(f'总共获取美女图片{len(rt)}张.')
+    try:
+
+        executor = futures.ThreadPoolExecutor(max_workers = 8)
+        for url in rt:
+            f = executor.submit(requests.get,url)
+            fs.append(f)
+    
+        futures.wait(fs)
+
+        for i in fs:
+            if i.result().status_code==200:
+                file = open(f'/storage/emulated/0/知乎图片/{int(time.time()*1000)}.jpg',mode = 'ab')
+                file.write(i.result().content)
+                print("写入成功！")
+        file.close()
+        print(f'总共获取美女图片{len(rt)}张.')
+    except:
+        print("出错!")
 
 
 def topic():
