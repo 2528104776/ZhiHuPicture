@@ -1,4 +1,6 @@
 import requests,re,time,os
+from concurrent import futures
+
 
 params = {
   "include":"data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp,is_labeled,is_recognized,paid_info,paid_info_content;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics",
@@ -7,7 +9,7 @@ params = {
   "sort_by":"default",
   "platform":"desktop"}
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
-urls = [];result = [];
+urls = [];result = [];fs = [];
 
 def main(x):
     try:
@@ -25,12 +27,20 @@ def main(x):
         print("到底了！")
 
     rt = list(set(result))
+
+    executor = futures.ThreadPoolExecutor(max_workers = 8)
     for url in rt:
-        res = requests.get(url,headers = headers)
-        if res.status_code==200:
-            with open(f'/storage/emulated/0/知乎图片/{int(time.time()*1000)}.jpg',mode = 'ab')as file:
-                file.write(res.content)
-                print("写入成功！")
+        f = executor.submit(requests.get,url)
+        fs.append(f)
+
+    futures.wait(fs)
+
+    for i in fs:
+        if i.status_code==200:
+            file = open(f'/storage/emulated/0/知乎图片/{int(time.time()*1000)}.jpg',mode = 'ab')
+            file.write(res.content)
+            print("写入成功！")
+    file.close()
     print(f'总共获取美女图片{len(rt)}张.')
 
 
