@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import requests,re,time,os
 from concurrent import futures
 
